@@ -17,3 +17,7 @@ $router->get('/', function () use ($router) {
 });
 
 $router->post('/save-details', 'DataController@saveDetails');
+$router->post('/save-photo', 'DataController@savePhoto');
+$router->post('/save-license', 'DataController@saveLicense');
+$router->post('/save-passport', 'DataController@savePassport');
+$router->post('/save-permit', 'DataController@savePermit');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applications;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DataController extends Controller
 {
@@ -20,7 +21,7 @@ class DataController extends Controller
     public function saveDetails(Request $request) {
 
         if ($request->has('email')) {
-            $application = Applications::whereEmail($request)->first();
+            $application = Applications::whereEmail($request->get('email'))->first();
             if ($application) {
                 if ($application->completed == 1) {
                     return 'Application is already submitted for this email';
@@ -50,6 +51,58 @@ class DataController extends Controller
             return 'No Email Found !';
         }
 
+    }
+
+    public function savePhoto(Request $request) {
+        if ($request->has('email')) {
+            if ($request->has('image')) {
+                $fileName = $request->get('email').'photoId'.'.'.$request->image->extension();
+                $request->image->move(base_path('public').'/uploads', $fileName);
+                Applications::whereEmail($request->get('email'))->update(['photo_id' => $fileName]);
+                return 1;
+            }
+            return 'No Image Found';
+        }
+        return 'No Email Found';
+    }
+
+    public function saveLicense(Request $request) {
+        if ($request->has('email')) {
+            if ($request->has('image')) {
+                $fileName = $request->get('email').'license'.'.'.$request->image->extension();
+                $request->image->move(base_path('public').'/uploads', $fileName);
+                Applications::whereEmail($request->get('email'))->update(['driving_license' => $fileName]);
+                return 1;
+            }
+            return 'No License Found';
+        }
+        return 'No Email Found';
+    }
+
+    public function savePassport(Request $request) {
+        if ($request->has('email')) {
+            if ($request->has('image')) {
+                $fileName = $request->get('email').'passport'.'.'.$request->image->extension();
+                $request->image->move(base_path('public').'/uploads', $fileName);
+                Applications::whereEmail($request->get('email'))->update(['passport' => $fileName]);
+                return 1;
+            }
+            return 'No Passport Found';
+        }
+        return 'No Email Found';
+    }
+
+    public function savePermit(Request $request) {
+        if ($request->has('email')) {
+            if ($request->has('image')) {
+                $fileName = $request->get('email').'permit'.'.'.$request->image->extension();
+                $request->image->move(base_path('public').'/uploads', $fileName);
+                Applications::whereEmail($request->get('email'))->update(['uk_residence_permit' => $fileName]);
+                return 1;
+            }
+            return 'No Permit Found';
+        }
+        return 'No Email Found';
     }
 
     //

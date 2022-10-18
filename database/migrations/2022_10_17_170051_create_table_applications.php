@@ -34,7 +34,6 @@ return new class extends Migration
             $table->string('passport')->nullable();
             $table->string('driving_license')->nullable();
             $table->string('uk_residence_permit')->nullable();
-            $table->string('eu_identity_card')->nullable();
             $table->integer('completed')->default(0);
             $table->timestamps();
         });
