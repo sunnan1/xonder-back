@@ -1,7 +1,7 @@
 <?php
-
+namespace App;
 /** @var \Laravel\Lumen\Routing\Router $router */
-
+use App\Http\Controllers\DataController;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,7 +12,8 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->post('/save-details', 'DataController@saveDetails');
