@@ -21,3 +21,4 @@ $router->post('/save-photo', 'DataController@savePhoto');
 $router->post('/save-license', 'DataController@saveLicense');
 $router->post('/save-passport', 'DataController@savePassport');
 $router->post('/save-permit', 'DataController@savePermit');
+$router->post('/get-details', 'DataController@getDetails');

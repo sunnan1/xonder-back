@@ -105,5 +105,13 @@ class DataController extends Controller
         return 'No Email Found';
     }
 
+    public function getDetails(Request $request) {
+        $app = Applications::whereEmail($request->get('email'))->first();
+        if ($app) {
+            return $app;
+        }
+        return -1;
+    }
+
     //
 }
