@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applications;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class DataController extends Controller
@@ -111,6 +112,27 @@ class DataController extends Controller
             return $app;
         }
         return -1;
+    }
+
+    public function complete(Request $request) {
+        
+        if ($request->has('email')) {
+            $application = Applications::whereEmail($request->email)->first()->toArray();
+            if ($application) {
+                Mail::send('mail', $application, function($message) use ($application) {
+                    $message->to($application['email'], $application['firstName'])->subject('Xonder Application');
+                    $message->from('no-reply@xonder.com','Xonder');
+                    $message->attach(base_path('public').'/uploads/'.$application['photo_id']);
+                    $message->attach(base_path('public').'/uploads/'.$application['passport']);
+                    $message->attach(base_path('public').'/uploads/'.$application['driving_license']);
+                    $message->attach(base_path('public').'/uploads/'.$application['uk_residence_permit']);
+                });
+                Applications::whereEmail($request->email)->update(['completed' => 1]);
+                return 1;
+            }
+        } else {
+            return  'No Email Found';
+        }
     }
 
     //

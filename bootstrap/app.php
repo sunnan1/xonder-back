@@ -61,6 +61,8 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('cors');
+$app->configure('mail');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +93,7 @@ $app->middleware([
 |
 */
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
