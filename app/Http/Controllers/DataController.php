@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applications;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,9 @@ class DataController extends Controller
     public function saveDetails(Request $request) {
 
         if ($request->has('email')) {
+            if ($request->get('email') == '' || $request->get('email') == null) {
+                return "Email can't be empty !";
+            }
             $application = Applications::whereEmail($request->get('email'))->first();
             if ($application) {
                 if ($application->completed == 1) {
@@ -29,23 +33,56 @@ class DataController extends Controller
                 }
             }
             else {
-                $application = new Applications();
+                if ($request->has('accountType')) {
+                    $application = new Applications();
+                    $application->email = $request->get('email');
+                } else {
+                    return 'Application not found for this email';
+                }
             }
-            $application->accountType = $request->get('accountType') ?? '';
-            $application->firstName = $request->get('firstName') ?? '';
-            $application->lastName = $request->get('lastName') ?? '';
-            $application->email = $request->get('email') ?? '';
-            $application->businessName = $request->get('businessName') ?? '';
-            $application->tradingName = $request->get('tradingName') ?? '';
-            $application->tradingAddress = $request->get('tradingAddress') ?? '';
-            $application->businessDescription = $request->get('businessDescription') ?? '';
-            $application->webAddress = $request->get('webAddress') ?? '';
-            $application->expectedTurnOver = $request->get('expectedTurnOver') ?? 0;
-            $application->singlePaymentIncome = $request->get('singlePaymentIncome') ?? 0;
-            $application->singlePaymentOutgoing = $request->get('singlePaymentOutgoing') ?? 0;
-            $application->largePaymentReceiveAccount = $request->get('largePaymentReceiveAccount') ?? 0;
-            $application->largePaymentTransferAccount = $request->get('largePaymentTransferAccount') ?? 0;
-            $application->averageAmountWeek = $request->get('averageAmountWeek') ?? 0;
+            if ($request->has('accountType')) {
+                $application->accountType = $request->get('accountType') ?? '';
+            }
+            if ($request->has('firstName')) {
+                $application->firstName = $request->get('firstName') ?? '';
+            }
+            if ($request->has('lastName')) {
+                $application->lastName = $request->get('lastName') ?? '';
+            }
+            if ($request->has('businessName')) {
+                $application->businessName = $request->get('businessName') ?? '';
+            }
+            if ($request->has('tradingName')) {
+                $application->tradingName = $request->get('tradingName') ?? '';
+            }
+            if ($request->has('tradingAddress')) {
+                $application->tradingAddress = $request->get('tradingAddress') ?? '';
+            }
+            if ($request->has('businessDescription')) {
+                $application->businessDescription = $request->get('businessDescription') ?? '';
+            }
+            if ($request->has('webAddress')) {
+                $application->webAddress = $request->get('webAddress') ?? '';
+            }
+            if ($request->has('expectedTurnOver')) {
+                $application->expectedTurnOver = $request->get('expectedTurnOver') ?? 0;
+            }
+            if ($request->has('singlePaymentIncome')) {
+                $application->singlePaymentIncome = $request->get('singlePaymentIncome') ?? 0;
+            }
+            if ($request->has('singlePaymentOutgoing')) {
+                $application->singlePaymentOutgoing = $request->get('singlePaymentOutgoing') ?? 0;
+            }
+            if ($request->has('largePaymentReceiveAccount')) {
+                $application->largePaymentReceiveAccount = $request->get('largePaymentReceiveAccount') ?? 0;
+            }
+            if ($request->has('largePaymentTransferAccount')) {
+                $application->largePaymentTransferAccount = $request->get('largePaymentTransferAccount') ?? 0;
+            }
+            if ($request->has('averageAmountWeek')) {
+                $application->averageAmountWeek = $request->get('averageAmountWeek') ?? 0;
+            }
+            
             $application->save();
             return 1;
         } else {
@@ -117,18 +154,28 @@ class DataController extends Controller
     public function complete(Request $request) {
         
         if ($request->has('email')) {
-            $application = Applications::whereEmail($request->email)->first()->toArray();
+            $application = Applications::whereEmail($request->email)->first();
             if ($application) {
-                Mail::send('mail', $application, function($message) use ($application) {
-                    $message->to($application['email'], $application['firstName'])->subject('Xonder Application');
-                    $message->from('no-reply@xonder.com','Xonder');
-                    $message->attach(base_path('public').'/uploads/'.$application['photo_id']);
-                    $message->attach(base_path('public').'/uploads/'.$application['passport']);
-                    $message->attach(base_path('public').'/uploads/'.$application['driving_license']);
-                    $message->attach(base_path('public').'/uploads/'.$application['uk_residence_permit']);
-                });
-                Applications::whereEmail($request->email)->update(['completed' => 1]);
-                return 1;
+                $application = $application->toArray();
+                if ($application['completed'] == 1) {
+                    return 'Application is already submitted';
+                }
+                try {
+                    Mail::send('mail', $application, function($message) use ($application) {
+                        $message->to($application['email'], $application['firstName'])->subject('Xonder Application');
+                        $message->from(config('mail.from.address'),config('mail.from.name'));
+                        $message->attach(base_path('public').'/uploads/'.$application['photo_id']);
+                        $message->attach(base_path('public').'/uploads/'.$application['passport']);
+                        $message->attach(base_path('public').'/uploads/'.$application['driving_license']);
+                        $message->attach(base_path('public').'/uploads/'.$application['uk_residence_permit']);
+                    });
+                    Applications::whereEmail($request->email)->update(['completed' => 1]);
+                    return 1;
+                }catch(Exception $exception) {
+                    return 'Something Went Wrong : '. $exception->getMessage();
+                }
+            } else {
+                return 'No Application Found';
             }
         } else {
             return  'No Email Found';

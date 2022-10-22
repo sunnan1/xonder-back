@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('tradingAddress')->nullable();
             $table->string('businessDescription')->nullable();
             $table->string('webAddress')->nullable();
-            $table->float('expectedTurnOver')->default(0);
-            $table->float('singlePaymentIncome')->default(0);
-            $table->float('singlePaymentOutgoing')->default(0);
-            $table->float('largePaymentReceiveAccount')->default(0);
-            $table->float('largePaymentTransferAccount')->default(0);
-            $table->float('averageAmountWeek')->default(0);
+            $table->string('expectedTurnOver')->default(0);
+            $table->string('singlePaymentIncome')->default(0);
+            $table->string('singlePaymentOutgoing')->default(0);
+            $table->string('largePaymentReceiveAccount')->default(0);
+            $table->string('largePaymentTransferAccount')->default(0);
+            $table->string('averageAmountWeek')->default(0);
             $table->string('photo_id')->nullable();
             $table->string('passport')->nullable();
             $table->string('driving_license')->nullable();
